@@ -18,62 +18,74 @@
  *
  */
 
-#include "my_string.h"
 #include "linked_list.h"
 
-// fügt argumente in Node ein, alloziert speicher für entstandene Node und gibt sie zurück
-Node* make_node(const char* vorname, const char* nachname)
+Node* make_node(Karte* info)
 {
 	Node* tmp;
 
 	if(!(tmp = (Node*) malloc(sizeof(Node))))
 		fprintf(stderr, "Nicht genügend Speicherplatz");
 
-	char_cpy(tmp->vorname, vorname);
-	char_cpy(tmp->nachname, nachname);
-
+	tmp->m_daten = info;	
 	return tmp;
 }
 
-int check_insertion_point(Node* ptr, const char* vorname, const char* nachname) //gibt 0 wenn punkt erreicht
-{
-	if(char_cmp(nachname, ptr->nachname) < 0 || (ptr == NULL)) { return 0; } // einfügen wenn nachname<listen name oder liste zu ende
-	else if(char_cmp(nachname, ptr->nachname) > 0) { return 1; } // nicht einfügen wenn nachname>listen name
-	else // nachname und listen name sind gleich
-	{
-		if(char_cmp(vorname, ptr->vorname) <= 0 || (ptr == NULL)) { return 0; } // einfügen wenn vorname<=listen vorname
-		else { return 1; } // nicht einfügen: vorname>listen vorname 
-	}
-}
-
-Node* insert_sorted(Node* head, const char* vorname, const char* nachname)
+Node* insert_sorted(Node* head, Karte* info, cmp_fptr t_fptr)
 {
 	Node* tmp;
 	Node* prev = head;
 	Node* ptr = head;
-
-	if(!head) // leere liste - head wird ende und neue node wird head
+	
+	if(!head)
 	{
-		tmp = make_node(vorname, nachname);
+		tmp = make_node(info);
 		tmp->next = head;
 		return tmp;
 	}
-	else if(char_cmp(nachname, head->nachname) < 0) //vor dem ersten einfügen nach nachname
+	else if((t_fptr(info, ptr->m_daten)) < 0)
 	{
-			tmp = make_node(vorname, nachname);
-			tmp->next = head;
-			return tmp;
+		tmp = make_node(info);
+		tmp->next = head;
+		return tmp;
 	}
-
-	while((ptr != NULL) && (check_insertion_point(ptr, vorname, nachname))) //bedingte auswertung, richtige stelle zum einfügen suchen
+	
+	while((ptr != NULL) && (t_fptr(info, ptr->m_daten) > 0))
 	{
 		prev = ptr;
 		ptr = ptr->next;
 	}
-
-	tmp = make_node(vorname, nachname);
-	prev->next = tmp; // vor gefundener stelle einfügen
+	
+	tmp = make_node(info);
+	prev->next = tmp;
 	tmp->next = ptr;
+	return head;
+}
+
+Node* read_into_list(FILE* source, cmp_fptr t_fptr)
+{
+	char buf_v[MAX];
+	char buf_n[MAX];
+	char buf_w[MAX];
+	int buf_t;
+	int buf_m;
+	int buf_j;
+	Node* head;
+	Karte* tmp_Karte;
+	
+	if(!source)
+	{
+		fprintf(stderr, "Datei konnte nicht geöffnet werden");
+		return NULL;
+	}
+	else
+	{
+		while(fscanf(source, "%s %s %d %d %d %s", buf_v, buf_n, &buf_t, &buf_m, &buf_j, buf_w) != EOF)
+		{
+			tmp_Karte = make_karte(buf_v, buf_n, buf_w, buf_t, buf_m, buf_j);
+			head = insert_sorted(head, tmp_Karte, t_fptr);
+		}
+	}
 	return head;
 }
 
@@ -82,7 +94,8 @@ void print_list(Node* head)
 	Node* ptr = head;
 	while(ptr)
 	{
-		printf("%s %s\n", ptr->vorname, ptr->nachname);
+		printf("\n");
+		print_karte(ptr->m_daten);
 		ptr = ptr->next;
 	}
 }
@@ -96,7 +109,8 @@ void delete_list(Node* head)
 	{
 		last = ptr; // akuelle node zum freigeben vorbereiten
 		ptr = ptr->next; // zum nächsten node wechseln
-		free(last); 
+		delete_karte(last->m_daten);
+		free(last);
 	}
 	head = NULL;
 }

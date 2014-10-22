@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS="-Wall"
 
-DEPS = linked_list.h macros.h my_string.h
-OBJ = main.o linked_list.o my_string.o
+DEPS = linked_list.h macros.h kartei_karte.h
+OBJ = main.o linked_list.o kartei_karte.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o  $@ $< $(CFLAGS) -g

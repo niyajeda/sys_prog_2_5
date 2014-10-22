@@ -23,19 +23,21 @@
 #define __LINKED_LIST_H__
 
 #include "macros.h"
+#include "kartei_karte.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node
 {
 	struct Node* next;
-	char vorname[MAX];
-	char nachname[MAX];
+	Karte* m_daten;
 } Node;
 
-Node* make_node(const char* vorname, const char* nachname);
-int check_insertion_point(Node* ptr, const char* vorname, const char* nachname); //gibt 0 wenn punkt erreicht
-Node* insert_sorted(Node* head, const char* vorname, const char* nachname);
+Node* make_node(Karte* info);	
+Node* insert_sorted(Node* head, Karte* info, cmp_fptr t_fptr);
+Node* read_into_list(FILE* source, cmp_fptr t_fptr); 
+
 void print_list(Node* head);
 void delete_list(Node* head);
 

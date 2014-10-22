@@ -19,12 +19,39 @@
  */
 
 /* inclusion guard */
-#ifndef __MY_STRING_H__
-#define __MY_STRING_H__
+#ifndef __KARTEI_KARTE_H__
+#define __KARTEI_KARTE_H__
 
+#include "macros.h"
+
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-void char_cpy(char* p, const char* q);
-int char_cmp(const char* p,const char* q);
+typedef struct Datum 
+{
+	int m_tag;
+	int m_monat;
+	int m_jahr;
+} Datum;
 
-#endif /* __MY_STRING_H__ */
+typedef struct Karte 
+{
+	char* m_vorname;
+	char* m_nachname;
+	char* m_wohnort;
+	Datum* m_datum;
+} Karte;
+
+typedef int (*cmp_fptr)(const Karte* a, const Karte* b);
+char* make_mem(const char* info);
+Datum* make_date(const int tag, const int monat, const int jahr);
+Karte* make_karte(const char* vorname, const char* nachname, const char* wohnort, const int tag, const int monat, const int jahr);
+int cmp_nachname(const Karte* a, const Karte* b);
+int cmp_wohnort(const Karte* a, const Karte* b);
+int cmp_datum(const Karte* a, const Karte* b);
+void print_datum(const Datum* datum);
+void print_karte(const Karte* info);
+void delete_karte(Karte* info);
+
+#endif /* __KARTEI_KARTE_H__ */
