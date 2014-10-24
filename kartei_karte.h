@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct Datum 
+typedef struct Datum // hilfsdatentyp 
 {
 	int m_tag;
 	int m_monat;
@@ -43,7 +43,7 @@ typedef struct Karte
 	Datum* m_datum;
 } Karte;
 
-typedef int (*cmp_fptr)(const Karte* a, const Karte* b);
+typedef int (*cmp_fptr)(const Karte* a, const Karte* b); // ist leichter 
 char* make_mem(const char* info);
 Datum* make_date(const int tag, const int monat, const int jahr);
 Karte* make_karte(const char* vorname, const char* nachname, const char* wohnort, const int tag, const int monat, const int jahr);

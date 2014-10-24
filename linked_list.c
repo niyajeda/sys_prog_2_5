@@ -27,7 +27,7 @@ Node* make_node(Karte* info)
 	if(!(tmp = (Node*) malloc(sizeof(Node))))
 		fprintf(stderr, "Nicht genügend Speicherplatz");
 
-	tmp->m_daten = info;	
+	tmp->m_daten = info;
 	return tmp;
 }
 
@@ -37,57 +37,33 @@ Node* insert_sorted(Node* head, Karte* info, cmp_fptr t_fptr)
 	Node* prev = head;
 	Node* ptr = head;
 	
-	if(!head)
+	if(!head) // liste ist leer
 	{
 		tmp = make_node(info);
 		tmp->next = head;
 		return tmp;
 	}
-	else if((t_fptr(info, ptr->m_daten)) < 0)
+	else if(((t_fptr)(info, ptr->m_daten)) < 0) // ptr != NULL, vor dem ersten einfügen
 	{
 		tmp = make_node(info);
 		tmp->next = head;
 		return tmp;
 	}
 	
-	while((ptr != NULL) && (t_fptr(info, ptr->m_daten) > 0))
+	while((ptr != NULL) && ((t_fptr)(info, ptr->m_daten) >= 0)) // stelle zum einfügen finden
 	{
 		prev = ptr;
 		ptr = ptr->next;
 	}
 	
+	// vor gefundener stelle einfügen
 	tmp = make_node(info);
 	prev->next = tmp;
 	tmp->next = ptr;
 	return head;
 }
 
-Node* read_into_list(FILE* source, cmp_fptr t_fptr)
-{
-	char buf_v[MAX];
-	char buf_n[MAX];
-	char buf_w[MAX];
-	int buf_t;
-	int buf_m;
-	int buf_j;
-	Node* head;
-	Karte* tmp_Karte;
-	
-	if(!source)
-	{
-		fprintf(stderr, "Datei konnte nicht geöffnet werden");
-		return NULL;
-	}
-	else
-	{
-		while(fscanf(source, "%s %s %d %d %d %s", buf_v, buf_n, &buf_t, &buf_m, &buf_j, buf_w) != EOF)
-		{
-			tmp_Karte = make_karte(buf_v, buf_n, buf_w, buf_t, buf_m, buf_j);
-			head = insert_sorted(head, tmp_Karte, t_fptr);
-		}
-	}
-	return head;
-}
+
 
 void print_list(Node* head)
 {
